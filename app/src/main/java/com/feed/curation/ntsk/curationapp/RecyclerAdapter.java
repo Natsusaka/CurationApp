@@ -2,6 +2,8 @@ package com.feed.curation.ntsk.curationapp;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -11,6 +13,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import java.io.File;
 import java.util.ArrayList;
 
 /**
@@ -49,8 +52,14 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
             viewHolder.textView_main.setText(item.getTitle());
             viewHolder.textView_sub.setText(item.getSitename());
 
-            ImgGetTask imgGetTask = new ImgGetTask(mainActivity,viewHolder.imageView);
-            imgGetTask.execute(item.getUrl());
+            String imagePath = item.getImageUrl();
+            Bitmap bm = BitmapFactory.decodeFile(imagePath);
+            viewHolder.imageView.setImageBitmap(bm);
+
+
+
+            //ImgGetTask imgGetTask = new ImgGetTask(mainActivity,viewHolder.imageView);
+            //imgGetTask.execute(item.getUrl());
         }
 
         // クリック処理

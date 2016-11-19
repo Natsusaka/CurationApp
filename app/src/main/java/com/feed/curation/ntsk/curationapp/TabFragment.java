@@ -30,13 +30,29 @@ import io.realm.Sort;
  */
 
 public class TabFragment extends Fragment implements OnRecyclerListener{
+    private MainActivity mainActivity;
     private Realm mRealm;
     private RealmResults<Item> mItemRealmResults;
     RealmQuery<Item> query;
     private RealmChangeListener mRealmListener = new RealmChangeListener() {
         @Override
         public void onChange(Object element) {
+            // 通知関連の処理
+            mItemRealmResults.addChangeListener(listener);//仮
+        }
+    };
+    private RealmChangeListener listener = new RealmChangeListener<RealmResults<Item>>() {
+        @Override
+        public void onChange(RealmResults<Item> results) {
             //reloadRecycleView();
+            for (int i = 0; i < results.size(); i++) {
+                Item item = results.get(i);
+                String mUrl = item.getUrl();
+                ImgGetTask imgGetTask = new ImgGetTask(mainActivity);
+                imgGetTask.execute(mUrl);
+                refresh();
+            }
+
         }
     };
     private Activity mActivity;
@@ -89,7 +105,7 @@ public class TabFragment extends Fragment implements OnRecyclerListener{
     }
 
 
-    @Override
+   @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
         mView = inflater.inflate(R.layout.tab_fragment, container, false);
 
@@ -123,7 +139,6 @@ public class TabFragment extends Fragment implements OnRecyclerListener{
             public void onRefresh() {
                 // 引っ張って離した時に呼ばれる
                 reloadRss();
-                //refresh();
                 if (mSwipeRefresh.isRefreshing()) {
                     mSwipeRefresh.setRefreshing(false);
                 }

@@ -3,18 +3,28 @@ package com.feed.curation.ntsk.curationapp;
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.ProgressDialog;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
+import android.os.Environment;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.util.Xml;
 import android.view.View;
 
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -24,6 +34,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import io.realm.Realm;
+import io.realm.RealmQuery;
 import io.realm.RealmResults;
 
 /**
@@ -51,10 +62,7 @@ public class RssParserTask extends AsyncTask<String,Integer,String> {
     //　タスク実行直後にコールされる
     @Override
     protected void onPreExecute() {
-        // プログレスバーを表示
-        mProgressDialog = new ProgressDialog(mActivity);
-        mProgressDialog.setMessage("ニュースを取得しています...");
-        mProgressDialog.show();
+
     }
 
     // バックグラウンドでの処理を担う。タスク実行時に渡された値を引数とする
@@ -75,7 +83,7 @@ public class RssParserTask extends AsyncTask<String,Integer,String> {
                 Log.d("URL",mUrl);
                 InputStream is = url.openConnection().getInputStream();
                 parseXml(is);
-                result = "complete";
+                result = mUrl;
             }
             // 元の処理(この場合、URLを1つしか指定できない。)
             //URL url = new URL("param[0]");  //paramはtask.executeする際に引数でURLを渡す。
@@ -90,7 +98,6 @@ public class RssParserTask extends AsyncTask<String,Integer,String> {
     // メインスレッド上で実行される
     @Override
     protected void onPostExecute (String result) {
-        mProgressDialog.dismiss();
         //mRecyclerView.setAdapter(result);
 
         //mListView.setAdapter(result);
